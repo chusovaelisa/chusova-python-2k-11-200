@@ -1,5 +1,6 @@
 import requests
 
+
 def get_country_by_ip(ip):
     try:
         url = f"http://ip-api.com/json/{ip}"
@@ -12,6 +13,7 @@ def get_country_by_ip(ip):
             return "Ошибка: Неверный IP или невозможно определить страну."
     except requests.exceptions.RequestException:
         return "Ошибка: Невозможно выполнить запрос к сервису."
+
 
 if __name__ == "__main__":
     ip = input("Введите IP-адрес: ")
