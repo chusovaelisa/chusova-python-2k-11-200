@@ -1,6 +1,11 @@
+import pytest
 import urllib.parse
+
+
 def normalize_image_url(image_url):
-    if not image_url.startswith("http://") and not image_url.startswith("https://"):
+    parsed_url = urllib.parse.urlparse(image_url)
+    
+    if not parsed_url.scheme:
         image_url = "http:" + image_url
 
     parsed_url = urllib.parse.urlparse(image_url)
@@ -9,16 +14,17 @@ def normalize_image_url(image_url):
 
     return image_url
 
-image_url1 = "https://http.cat/200.jpg"
-image_url2 = "//http.cat/200.jpg"
-image_url3 = "/200.jpg"
+@pytest.mark.parametrize("image_url, expected_url", [
+    ("https://http.cat/200.jpg", "https://http.cat/200.jpg"),
+    ("//http.cat/200.jpg", "http://http.cat/200.jpg"),
+    ("/200.jpg", "http:/200.jpg")
+])
 
-def test_normalize_image_url():
-    assert normalize_image_url(image_url1) == "https://http.cat/200.jpg"
-    assert normalize_image_url(image_url2) == "http://http.cat/200.jpg"
-    assert normalize_image_url(image_url3) == "http:/200.jpg"
+
+def test_normalize_image_url(image_url, expected_url):
+    assert normalize_image_url(image_url) == expected_url
+
 
 if __name__ == "__main__":
-    import pytest
-
     pytest.main()
+

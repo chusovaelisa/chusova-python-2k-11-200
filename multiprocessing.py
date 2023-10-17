@@ -2,17 +2,11 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
-import threading
+from multiprocessing import Pool
 
 
 def normalize_image_url(image_url, base_url):
-    # Проверяем, есть ли протокол в URL
-    if not image_url.startswith("http://") and not image_url.startswith("https://"):
-        # Если нет, добавляем протокол и домен текущей страницы
-        parsed_url = urlparse(base_url)
-        image_url = urljoin(parsed_url.scheme + "://" + parsed_url.netloc, image_url)
-
-    return image_url
+    return urljoin(base_url, image_url)
 
 
 def download_image(image_url, save_folder):
@@ -22,7 +16,6 @@ def download_image(image_url, save_folder):
         response = requests.get(image_url, headers=headers)
         response.raise_for_status()
 
-        # Извлекаем имя файла из URL
         filename = os.path.join(save_folder, os.path.basename(urlparse(image_url).path))
 
         with open(filename, 'wb') as file:
@@ -43,15 +36,16 @@ def download_all_images(page_url, save_folder):
 
         image_tags = soup.find_all('img')
 
-        threads = []
-        for img in image_tags:
-            image_url = normalize_image_url(img['src'], page_url)
-            thread = threading.Thread(target=download_image, args=(image_url, save_folder))
-            threads.append(thread)
-            thread.start()
+        pool = Pool(processes=4)
 
-        for thread in threads:
-            thread.join()
+        base_url = urlparse(page_url).scheme + "://" + urlparse(page_url).netloc
+        image_urls = [normalize_image_url(img['src'], base_url) for img in image_tags]
+        save_folders = [save_folder] * len(image_urls)
+
+        pool.starmap(download_image, zip(image_urls, save_folders))
+
+        pool.close()
+        pool.join()
 
     except Exception as e:
         print(f"Ошибка при загрузке страницы {page_url}: {e}")
