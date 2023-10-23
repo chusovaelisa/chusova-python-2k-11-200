@@ -19,8 +19,6 @@ def normalize_image_url(image_url):
     ("//http.cat/200.jpg", "http://http.cat/200.jpg"),
     ("/200.jpg", "http:/200.jpg")
 ])
-
-
 def test_normalize_image_url(image_url, expected_url):
     assert normalize_image_url(image_url) == expected_url
 

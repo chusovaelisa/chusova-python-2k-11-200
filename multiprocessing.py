@@ -1,5 +1,6 @@
 import os
 import requests
+
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
 from multiprocessing import Pool
@@ -36,16 +37,12 @@ def download_all_images(page_url, save_folder):
 
         image_tags = soup.find_all('img')
 
-        pool = Pool(processes=4)
-
         base_url = urlparse(page_url).scheme + "://" + urlparse(page_url).netloc
         image_urls = [normalize_image_url(img['src'], base_url) for img in image_tags]
         save_folders = [save_folder] * len(image_urls)
 
-        pool.starmap(download_image, zip(image_urls, save_folders))
-
-        pool.close()
-        pool.join()
+        with Pool(processes=4) as pool:
+            pool.starmap(download_image, zip(image_urls, save_folders))
 
     except Exception as e:
         print(f"Ошибка при загрузке страницы {page_url}: {e}")
