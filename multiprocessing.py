@@ -1,9 +1,9 @@
 import os
 import requests
+from multiprocessing import Pool
+from urllib.parse import urlparse, urljoin
 
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse, urljoin
-from multiprocessing import Pool
 
 
 def normalize_image_url(image_url, base_url):
@@ -13,13 +13,14 @@ def normalize_image_url(image_url, base_url):
 def download_image(image_url, save_folder):
     try:
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
         response = requests.get(image_url, headers=headers)
         response.raise_for_status()
 
         filename = os.path.join(save_folder, os.path.basename(urlparse(image_url).path))
 
-        with open(filename, 'wb') as file:
+        with open(filename, "wb") as file:
             file.write(response.content)
 
         print(f"Изображение скачано: {image_url}")
@@ -30,15 +31,16 @@ def download_image(image_url, save_folder):
 def download_all_images(page_url, save_folder):
     try:
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
         response = requests.get(page_url, headers=headers)
         response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'html.parser')
+        soup = BeautifulSoup(response.text, "html.parser")
 
-        image_tags = soup.find_all('img')
+        image_tags = soup.find_all("img")
 
         base_url = urlparse(page_url).scheme + "://" + urlparse(page_url).netloc
-        image_urls = [normalize_image_url(img['src'], base_url) for img in image_tags]
+        image_urls = [normalize_image_url(img["src"], base_url) for img in image_tags]
         save_folders = [save_folder] * len(image_urls)
 
         with Pool(processes=4) as pool:

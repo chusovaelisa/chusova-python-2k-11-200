@@ -14,6 +14,7 @@ def normalize_image_url(image_url):
 
     return image_url
 
+
 @pytest.mark.parametrize("image_url, expected_url", [
     ("https://http.cat/200.jpg", "https://http.cat/200.jpg"),
     ("//http.cat/200.jpg", "http://http.cat/200.jpg"),
