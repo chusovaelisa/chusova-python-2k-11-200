@@ -1,9 +1,10 @@
 import os
-import requests
 from multiprocessing import Pool
 from urllib.parse import urlparse, urljoin
 
+import requests
 from bs4 import BeautifulSoup
+
 
 
 def normalize_image_url(image_url, base_url):
@@ -59,3 +60,4 @@ if __name__ == "__main__":
 
     download_all_images(page_url, save_folder)
     print("Завершено.")
+    

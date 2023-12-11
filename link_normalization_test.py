@@ -4,13 +4,9 @@ import urllib.parse
 
 def normalize_image_url(image_url):
     parsed_url = urllib.parse.urlparse(image_url)
-    
-    if not parsed_url.scheme:
-        image_url = "http:" + image_url
 
-    parsed_url = urllib.parse.urlparse(image_url)
-    if not parsed_url.netloc:
-        return image_url
+    if not parsed_url.scheme or not parsed_url.netloc:
+        image_url = "http:" + image_url
 
     return image_url
 
@@ -26,4 +22,3 @@ def test_normalize_image_url(image_url, expected_url):
 
 if __name__ == "__main__":
     pytest.main()
-
