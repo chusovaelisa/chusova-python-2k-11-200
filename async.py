@@ -1,10 +1,8 @@
 import asyncio
 import os
-
 import aiohttp
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
-
 
 async def download_image(session, image_url, save_folder):
     try:
@@ -17,7 +15,6 @@ async def download_image(session, image_url, save_folder):
             print(f"Изображение скачано: {image_url}")
     except Exception as e:
         print(f"Ошибка при счачивании изображения {image_url}: {e}")
-
 
 async def download_all_images(page_url, save_folder):
     async with aiohttp.ClientSession() as session:
@@ -34,10 +31,9 @@ async def download_all_images(page_url, save_folder):
         except Exception as e:
             print(f"Ошибка при загрузке страницы {page_url}: {e}")
 
-
 async def main():
-    page_url = input("Введите URL страницы: ")
-    save_folder = input("Введите папку для сохранения изображений: ")
+    page_url = "https://kotocafe.ru/"  
+    save_folder = "/Users/liska/Desktop" 
 
     if not await aio_exists(save_folder):
         os.makedirs(save_folder)
@@ -45,9 +41,9 @@ async def main():
     await download_all_images(page_url, save_folder)
     print("Завершено.")
 
-
 async def aio_exists(path):
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(None, os.path.exists, path)
+
 if __name__ == "__main__":
     asyncio.run(main())
